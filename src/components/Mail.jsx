@@ -13,10 +13,20 @@ import {
 } from "react-icons/md";
 import { BiArchiveIn } from "react-icons/bi";
 import { useSelector } from "react-redux";
-
+import { db } from "../firebase";
+import { deleteDoc, doc } from "firebase/firestore";
 const Mail = () => {
+  const params = useParams();
   const navigate = useNavigate();
   const { selectedEmail } = useSelector((store) => store.appSlice);
+  const deleteMailById = async (id) => {
+    try {
+      await deleteDoc(doc(db, "emails", id));
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="flex-1 bg-white rounded-xl mx-5">
@@ -34,7 +44,10 @@ const Mail = () => {
           <div className="p-2 rounded-full hover:bg-gray-100 cursor-pointer">
             <MdOutlineReport size={"20px"} />
           </div>
-          <div className="p-2 rounded-full hover:bg-gray-100 cursor-pointer">
+          <div
+            onClick={() => deleteMailById(params.id)}
+            className="p-2 rounded-full hover:bg-gray-100 cursor-pointer"
+          >
             <MdDeleteOutline size={"20px"} />
           </div>
           <div className="p-2 rounded-full hover:bg-gray-100 cursor-pointer">
