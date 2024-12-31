@@ -1,13 +1,31 @@
-import React from "react";
+import React, { useState } from "react";
 import { IoIosSearch } from "react-icons/io";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { FaRegQuestionCircle } from "react-icons/fa";
 import { PiDotsNineBold } from "react-icons/pi";
 import { IoSettingsOutline } from "react-icons/io5";
 import { Avatar } from "@mui/material";
+import { motion, AnimatePresence } from "framer-motion";
+import { signOut } from "firebase/auth";
+import { auth } from "../../firebase";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "../../redux/appSlice";
 // import Avatar from "react-avatar-edit";
 
 const Navbar = () => {
+  const [toggle, setToggle] = useState(false);
+  const dispatch = useDispatch();
+  const { user } = useSelector((store) => store.appSlice);
+
+  const signOutHandler = () => {
+    signOut(auth)
+      .then(() => {
+        dispatch(setUser(null));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   return (
     <div className="flex items-center justify-between mx-3 h-16">
       <div className="flex items-center gap-10">
@@ -46,10 +64,26 @@ const Navbar = () => {
           </div>
           <div className=" cursor-pointer">
             <Avatar
-              src="https://easy-peasy.ai/cdn-cgi/image/quality=80,format=auto,width=700/https://fdczvxmwwjwpwbeeqcth.supabase.co/storage/v1/object/public/images/50dab922-5d48-4c6b-8725-7fd0755d9334/3a3f2d35-8167-4708-9ef0-bdaa980989f9.png"
+              onClick={() => setToggle(!toggle)}
+              src={user?.photoURL}
               size="40"
               round={true}
             />
+            <AnimatePresence>
+              {toggle && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.1 }}
+                  className="absolute right-2 z-20 shadow-lg bg-white rounded-md"
+                >
+                  <p onClick={signOutHandler} className="p-2 underline">
+                    LogOut
+                  </p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
